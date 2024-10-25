@@ -5,6 +5,33 @@
 {% endblock %}
 
 {% block main %}
-    <p><b>{{ user_name }}</b>, welcome back!</p>
-    <p>Your cash balance is: <b>{{ user_balance_formatted }}</b></p>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Velkommen!</h1>
+                <p>Her kan du rapporere besøkstall.</p>
+                <p>Her er oversikt over virksomhetene du disponerer:</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Virksomhet</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Møtestedet</td>
+                            <td>
+                                <form action="/ny-rapport" method="post">
+                                    <button class="btn btn-primary btn-sm" type="submit">Rapporter</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><b>{{ user_name }}</b>, velkommen tilbake!</p>
+                <p>Your cash balance is: <b>{{ user_balance_formatted }}</b></p>
+            </div>
+        </div>
+    </div>
 {% endblock %}

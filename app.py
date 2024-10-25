@@ -19,7 +19,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+db = SQL("sqlite:///kb_teller.db")
 
 
 @app.after_request
@@ -35,12 +35,10 @@ def after_request(response):
 @login_required
 def index():
     user_name = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]['username']
-    user_balance_formatted = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]['cash']
 
     """Show portfolio of stocks"""
     return render_template("index.html",
-                           user_name=user_name,
-                           user_balance_formatted=usd(user_balance_formatted),
+                           user_name=user_name
                            )
 
 
@@ -130,7 +128,7 @@ def login():
         return render_template("login.html")
 
 
-@app.route("/logout")
+@app.route("/logg-ut")
 def logout():
     """Log user out"""
 
@@ -141,7 +139,7 @@ def logout():
     return redirect("/")
 
 
-@app.route("/quote", methods=["GET", "POST"])
+@app.route("/ny-rapport", methods=["GET", "POST"])
 @login_required
 def quote():
     """Get stock quote."""
@@ -159,8 +157,8 @@ def quote():
 
         return render_template("quoted.html", data=data, price=price)
     else:
-        return render_template("quote.html")
-
+        return render_template("rapport.html")
+    
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -173,19 +171,19 @@ def register():
     if request.method == "POST":
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("Username missing", 400)
+            return apology("Brukernavn mangler", 400)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("Password missing", 400)
+            return apology("Passord mangler", 400)
 
         # Ensure confirmation of password was submitted
         elif not request.form.get("confirmation"):
-            return apology("You need to confirm password", 400)
+            return apology("Du må bekrefte passordet", 400)
 
         # Ensure password and confirmation are the same
         elif request.form.get("confirmation") != request.form.get("password"):
-            return apology("Passwords don't match", 400)
+            return apology("Passordene matcher ikke", 400)
 
         # Query database for username
         rows = db.execute(
@@ -194,13 +192,28 @@ def register():
 
         # Check to see if username already exists
         if len(rows) != 0:
-            return apology("User already exists", 400)
+            return apology("Brukernavnet er allerede tatt", 400)
 
         # Hash the password
         pwdhash = generate_password_hash(request.form.get("password"))
 
-        # Insert new user to the table
+        # Insert new user to the users table
         db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", request.form.get("username"), pwdhash)
+
+        # Retrieve the users id
+        result = db.execute("SELECT id FROM users WHERE username = ?", request.form.get("username"))
+        if result:  # Check if the result is not empty
+            usr_id = result[0]['id']  # Extract the id from the first row
+        else:
+            usr_id = None  # Handle case where no user is found
+
+        # Insert user detail to the user_details table
+        db.execute("INSERT INTO user_details (usr_fname, usr_lname, usr_email, usr_cellphone, user_id) VALUES (?, ?, ?, ?, ?)", 
+                   request.form.get("fname"), 
+                   request.form.get("lname"),
+                   request.form.get("email"),
+                   request.form.get("cellphone"),
+                   usr_id)
 
         # Log the user in
         rows = db.execute("SELECT id FROM users WHERE username = ?", request.form.get("username"))
