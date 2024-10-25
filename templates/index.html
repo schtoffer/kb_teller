@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Log In
+    Forside
 {% endblock %}
 
 {% block main %}
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h1>Velkommen!</h1>
+                <p><b>{{ fname }}</b>, velkommen tilbake!</p>
                 <p>Her kan du rapporere besøkstall.</p>
                 <p>Her er oversikt over virksomhetene du disponerer:</p>
                 <table class="table table-bordered">
@@ -29,8 +29,6 @@
                         </tr>
                     </tbody>
                 </table>
-                <p><b>{{ user_name }}</b>, velkommen tilbake!</p>
-                <p>Your cash balance is: <b>{{ user_balance_formatted }}</b></p>
             </div>
         </div>
     </div>
