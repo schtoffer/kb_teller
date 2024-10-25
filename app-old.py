@@ -4,11 +4,8 @@ from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-# from inspirational_quotes import quote
 
 from helpers import apology, login_required, lookup, usd
-
-# sitat = quote()['quote']
 
 # Configure application
 app = Flask(__name__)
@@ -37,16 +34,59 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    # Retrieve username and fname
     user_name = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]['username']
-    fname = db.execute("SELECT usr_fname FROM user_details WHERE user_id = ?", session["user_id"])[0]['usr_fname']
 
-
-    # Render welcome page
+    """Show portfolio of stocks"""
     return render_template("index.html",
-                           user_name=user_name,
-                           fname=fname
+                           user_name=user_name
                            )
+
+
+@app.route("/buy", methods=["GET", "POST"])
+@login_required
+def buy():
+    data = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
+    user_balance = data[0]['cash']
+    user_balance_formatted = usd(data[0]['cash'])
+
+    # Check for valid input
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        data = lookup(symbol)
+
+        if not data:
+            return apology("That is not a valid ticker", 400)
+
+        if not request.form.get("symbol"):
+            return apology("You have to enter a ticket before you submit", 400)
+
+        if not request.form.get("shares").isdigit() or int(request.form.get("shares")) < 1:
+            return apology("You have to type a positive number", 400)
+
+        # Compute transaction
+        n_shares = int(request.form.get("shares"))
+        share_price = data['price']
+        order_sum = n_shares * share_price
+        user_balance = user_balance - order_sum
+
+        # Update users cash balance
+        db.execute("UPDATE users SET cash = ? WHERE id = ?", user_balance, session["user_id"])
+
+        # Track the transaction in purchases table
+        db.execute("INSERT INTO purchases (user_id, symbol, shares, price) VALUES (?, ?, ?, ?)", session["user_id"], request.form.get("symbol"), n_shares, share_price)
+
+        return redirect("/")
+    else:
+        return render_template("buy.html", user_balance_formatted=user_balance_formatted)
+
+
+@app.route("/history")
+@login_required
+def history():
+    """Show history of transactions"""
+    rows = db.execute("SELECT * FROM purchases WHERE user_id = ?", session["user_id"])
+    print(rows)
+    return render_template("history.html", rows=rows)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -185,3 +225,10 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
+
+
+@app.route("/sell", methods=["GET", "POST"])
+@login_required
+def sell():
+    """Sell shares of stock"""
+    return apology("TODO")
