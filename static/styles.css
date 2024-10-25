@@ -21,3 +21,16 @@ nav .navbar-brand .green
 {
     color: #2e944b;
 }
+
+#reportDate {
+    max-width: 160px;
+}
+
+/* Ensure left alignment */
+body {
+    text-align: left; /* Default left alignment for all text */
+}
+
+.container p, h1 {
+    text-align: left; /* Left-align all paragraphs in .container */
+}

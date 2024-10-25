@@ -6,17 +6,30 @@
 
 {% block main %}
     <div class="mb-3">
-        <h1>Please register a new user</h1>
+        <h1>Velg et brukernavn og passord</h1>
     </div>
     <form action="/register" method="post">
         <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Username" type="text">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Brukernavn" type="text">
         </div>
         <div class="mb-3">
-            <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password">
+            <input class="form-control mx-auto w-auto" name="password" placeholder="Passord" type="password">
         </div>
         <div class="mb-3">
-            <input class="form-control mx-auto w-auto" name="confirmation" placeholder="Repeat password" type="password">
+            <input class="form-control mx-auto w-auto" name="confirmation" placeholder="Gjenta passord" type="password">
+        </div>
+
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="fname" placeholder="Fornavn" type="text">
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="lname" placeholder="Etternavn" type="text">
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="email" placeholder="E-post" type="text">
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="cellphone" placeholder="Telefon" type="text">
         </div>
         <button class="btn btn-primary" type="submit">Log In</button>
     </form>
