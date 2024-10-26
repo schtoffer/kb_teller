@@ -4,11 +4,10 @@ from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-# from inspirational_quotes import quote
 
 from helpers import apology, login_required, lookup, usd
-
-# sitat = quote()['quote']
+from utils.date_utils import format_dates
+from utils.sql_utils import sql
 
 # Configure application
 app = Flask(__name__)
@@ -37,16 +36,57 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    # Retrieve username and fname
-    user_name = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]['username']
-    fname = db.execute("SELECT usr_fname FROM user_details WHERE user_id = ?", session["user_id"])[0]['usr_fname']
+    # Retrieve user id
+    user_id = session["user_id"]
 
+    # Retrieve fname
+    fname = db.execute("SELECT usr_fname FROM user_details WHERE user_id = ?", session["user_id"])[0]['usr_fname']
+    
+    # Retreive businesses the user has access to
+    businesses = db.execute("SELECT * FROM businesses WHERE id IN (SELECT business_id FROM user_business_access WHERE user_id = ?)", session["user_id"])
+
+    # Query the user's role
+    user_roles = db.execute("SELECT role_name FROM user_roles WHERE user_id = ?", user_id)
+    
+    # Check if the user has the admin role
+    is_admin = any(role['role_name'] == 'admin' for role in user_roles)
 
     # Render welcome page
     return render_template("index.html",
-                           user_name=user_name,
-                           fname=fname
+                           fname=fname,
+                           businesses=businesses,
+                           is_admin=is_admin
                            )
+
+@app.route("/admin", methods=["GET", "POST"])
+@login_required
+def admin():
+    # Retrieve user id
+    user_id = session["user_id"]
+
+    # Get user roles
+    user_roles = db.execute("SELECT role_name FROM user_roles WHERE user_id IN (?)", user_id)
+
+    # Make sure the user is an admin
+    is_admin = any(user_role['role_name'] == 'admin' for user_role in user_roles)
+
+    if not is_admin:
+        # Redirect to the home page if not an admin
+        return redirect("/")
+    
+    else:
+        # Retreive all businesses
+        businesses = db.execute("SELECT * FROM businesses")
+
+        # Retrieve all users
+        users = db.execute("SELECT * FROM users")
+        print(users)
+
+        # Return the admin panel page
+        return render_template("admin.html", 
+                               businesses=businesses,
+                               users=users)  # Replace with your actual admin template
+
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -99,28 +139,28 @@ def logout():
     return redirect("/")
 
 
-@app.route("/ny-rapport", methods=["GET", "POST"])
+@app.route("/rapporter", methods=["GET", "POST"])
 @login_required
-def quote():
+def rapporter():
     """Get stock quote."""
     if request.method == "POST":
-        symbol = request.form.get("symbol")
-        data = lookup(symbol)
+        business_id = request.form.get("business_id")
+        
+        # Get name of business
+        business_name = sql("businesses", "name", business_id)
 
-        if not data:
-            return apology("That is not a valid ticker", 400)
+        # Get 14 formatted days
+        formatted_dates = format_dates(14)
 
-        if not request.form.get("symbol"):
-            return apology("You have to enter a ticket before you submit", 400)
-
-        price = usd(data['price'])
-
-        return render_template("quoted.html", data=data, price=price)
+        return render_template("rapport.html", 
+                               business_id=business_id, 
+                               formatted_dates=formatted_dates,
+                               business_name=business_name)
     else:
-        return render_template("rapport.html")
+        return redirect("/")
     
 
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/registrer", methods=["GET", "POST"])
 def register():
     """Register user"""
 

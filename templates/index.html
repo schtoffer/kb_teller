@@ -9,24 +9,26 @@
         <div class="row">
             <div class="col-12">
                 <p><b>{{ fname }}</b>, velkommen tilbake!</p>
-                <p>Her kan du rapporere besøkstall.</p>
-                <p>Her er oversikt over virksomhetene du disponerer:</p>
+                <p>Her er en oversikt over virksomhetene du disponerer:</p>
                 <table class="table table-bordered">
                     <thead>
-                        <tr>
-                            <th>Virksomhet</th>
-                            <th></th>
+                        <tr class="table-dark">
+                            <th scope="col">name</th>
+                            <th scope="col">btn</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for business in businesses%}
                         <tr>
-                            <td>Møtestedet</td>
+                            <td>{{ business.name }}</td>
                             <td>
-                                <form action="/ny-rapport" method="post">
-                                    <button class="btn btn-primary btn-sm" type="submit">Rapporter</button>
+                                <form action="/rapporter" method="POST">
+                                    <input type="hidden" name="business_id" value="{{ business.id }}">
+                                    <button type="submit" class="btn btn-primary btn-sm">Rapporter</button>
                                 </form>
                             </td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
