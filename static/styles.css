@@ -26,11 +26,10 @@ nav .navbar-brand .green
     max-width: 160px;
 }
 
-/* Ensure left alignment */
-body {
-    text-align: left; /* Default left alignment for all text */
+.table td {
+    background-color: #f3eff1;
 }
 
-.container p, h1 {
-    text-align: left; /* Left-align all paragraphs in .container */
+.table thead {
+    background-color: #ea433b; /* Change the background color of the thead */
 }

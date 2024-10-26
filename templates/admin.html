@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Forside
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h3>Virksomheter</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>name</th>
+                            <th>id</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for business in businesses%}
+                        <tr>
+                            <td>{{ business.name }}</td>
+                            <td>{{ business.id }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <h3>Brukere</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>brukernavn</th>
+                            <th>id</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users%}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.id }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
