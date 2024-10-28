@@ -5,7 +5,7 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd
+from helpers import apology, login_required, lookup, usd, validate_username, validate_password, validate_email, validate_cellphone
 from utils.date_utils import format_dates
 from utils.sql_utils import sql
 
@@ -100,11 +100,11 @@ def login():
     if request.method == "POST":
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("must provide username", 403)
+            return apology("Du må oppgi brukernavn", 403)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password", 403)
+            return apology("Du må oppgi passord", 403)
 
         # Query database for username
         rows = db.execute(
@@ -115,7 +115,7 @@ def login():
         if len(rows) != 1 or not check_password_hash(
             rows[0]["hash"], request.form.get("password")
         ):
-            return apology("invalid username and/or password", 403)
+            return apology("Du oppga ugyldig brukernavn og passord", 403)
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -160,48 +160,76 @@ def rapporter():
         return redirect("/")
     
 
-@app.route("/registrer", methods=["GET", "POST"])
+@app.route("/registrer-bruker", methods=["GET", "POST"])
 def register():
-    """Register user"""
 
     # Forget any user_id
     session.clear()
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            return apology("Brukernavn mangler", 400)
+        
+        # Define variables
+        usr_username = request.form.get("username").lower()
+        usr_pwd = request.form.get("password")
+        usr_pwd_repeat = request.form.get("confirmation")
+        usr_fname = request.form.get("fname").capitalize()
+        usr_lname = request.form.get("lname").capitalize()
+        usr_email = request.form.get("email").lower()
+        usr_cellphone = request.form.get("cellphone")
+        
+        # Ensure first name is provided
+        if not usr_fname:
+            error = "Fornavn mangler"
+            return render_template('register.html', error=error)
+
+        # Ensure last name is provided
+        if not usr_lname:
+            error = "Etternavn mangler"
+            return render_template('register.html', error=error)
+        
+        # Ensure last valid email is provided
+        if (email_validation := validate_email(usr_email)):
+            return render_template('register.html', error=email_validation[0])
+        
+        # Validate phone number
+        if (phone_validation := validate_cellphone(usr_cellphone)):
+            return render_template('register.html', error=phone_validation[0])
+        # Ensure username was submitted correctly
+        validation_error = validate_username(db, usr_username)
+        if validation_error:
+            error = validation_error[0]
+            return render_template('register.html', error=error)
 
         # Ensure password was submitted
-        elif not request.form.get("password"):
-            return apology("Passord mangler", 400)
+        elif not usr_pwd:
+            error = "Pasord mangler"
+            return render_template('register.html', error=error)
 
         # Ensure confirmation of password was submitted
-        elif not request.form.get("confirmation"):
-            return apology("Du må bekrefte passordet", 400)
+        elif not usr_pwd_repeat:
+            error = "Du må bekrefte passordet"
+            return render_template('register.html', error=error)
 
         # Ensure password and confirmation are the same
         elif request.form.get("confirmation") != request.form.get("password"):
-            return apology("Passordene matcher ikke", 400)
+            error = "Passordene du oppga er ikke like"
+            return render_template('register.html', error=error)
+        
+        # Validate the password
+        if (pwd_validation := validate_password(usr_pwd, usr_username)):
+            return render_template('register.html', error=pwd_validation[0])
 
-        # Query database for username
-        rows = db.execute(
-            "SELECT * FROM users WHERE username = ?", request.form.get("username")
-        )
-
-        # Check to see if username already exists
-        if len(rows) != 0:
-            return apology("Brukernavnet er allerede tatt", 400)
-
+ 
         # Hash the password
-        pwdhash = generate_password_hash(request.form.get("password"))
+        pwdhash = generate_password_hash(usr_pwd)
 
         # Insert new user to the users table
-        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", request.form.get("username"), pwdhash)
+        
+        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", usr_username, pwdhash)
 
         # Retrieve the users id
-        result = db.execute("SELECT id FROM users WHERE username = ?", request.form.get("username"))
+        result = db.execute("SELECT id FROM users WHERE username = ?", usr_username)
         if result:  # Check if the result is not empty
             usr_id = result[0]['id']  # Extract the id from the first row
         else:

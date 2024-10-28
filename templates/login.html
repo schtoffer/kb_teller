@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block main %}
+    <div class="mb-3 d-flex justify-content-center">
+        <h1>Logg inn</h1>
+    </div>
     <form action="/login" method="post">
         <div class="mb-3">
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Brukernavn" type="text">
@@ -12,7 +15,19 @@
         <div class="mb-3">
             <input class="form-control mx-auto w-auto" name="password" placeholder="Passord" type="password">
         </div>
-        <button class="btn btn-primary" type="submit">Logg inn</button>
+        {% if error %}
+            <div class="alert alert-danger text-center w-auto mx-auto" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary" type="submit">Logg inn</button>
+        </div>
     </form>
-    <p>Har du ikke brukernavn, så kan du <a href="/registrer">registrere deg her</a>.</p>
+    <div class="d-flex justify-content-center mt-4">
+        <p><b>Har du ikke bruker?</b></p>
+    </div>
+    <div class="d-flex justify-content-center">
+        <p>Registrer <a href="/registrer-bruker">ny bruker</a>.</p>
+        </div>
 {% endblock %}
