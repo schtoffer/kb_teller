@@ -10,14 +10,14 @@
             <div class="col-12">
                 <p><b>{{ fname }}</b>, velkommen tilbake!</p>
                 <p>Her er en oversikt over virksomhetene du disponerer:</p>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-responsive table-striped table-hover">
                     <thead>
-                        <tr class="table-dark">
+                        <tr>
                             <th scope="col">name</th>
                             <th scope="col">btn</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody  class="table-group-divider">
                         {% for business in businesses%}
                         <tr>
                             <td>{{ business.name }}</td>

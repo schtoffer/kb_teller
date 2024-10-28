@@ -42,7 +42,7 @@
                         </ul>
                     {% else %}
                         <ul class="navbar-nav ms-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/registrer">Registrer ny bruker</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/registrer-bruker">Registrer ny bruker</a></li>
                             <li class="nav-item"><a class="nav-link" href="/login">Logg inn</a></li>
                         </ul>
                     {% endif %}
@@ -52,7 +52,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 mt-2">
-                    <h2><em>Vi skal telle for å fortelle</em></h2>
+                    <p><span style="font-size: 26px;"><em>Vi skal <b>telle</b> for å <b>fortelle</b></em></span></p>
                 </div>
             </div>
         </div>
@@ -66,7 +66,13 @@
         {% endif %}
 
         <main class="py-3">
-            {% block main %}{% endblock %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 mt-2">
+                        {% block main %}{% endblock %}
+                    </div>
+                </div>
+            </div>
         </main>
 
         <footer class="mb-5">
