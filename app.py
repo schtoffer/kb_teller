@@ -5,15 +5,12 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd, validate_username, validate_password, validate_email, validate_cellphone
+import helpers as h
 from utils.date_utils import format_dates
 from utils.sql_utils import sql
 
 # Configure application
 app = Flask(__name__)
-
-# Custom filter
-app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -34,7 +31,7 @@ def after_request(response):
 
 
 @app.route("/")
-@login_required
+@h.login_required
 def index():
     # Retrieve user id
     user_id = session["user_id"]
@@ -59,7 +56,7 @@ def index():
                            )
 
 @app.route("/admin", methods=["GET", "POST"])
-@login_required
+@h.login_required
 def admin():
     # Retrieve user id
     user_id = session["user_id"]
@@ -100,11 +97,11 @@ def login():
     if request.method == "POST":
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("Du må oppgi brukernavn", 403)
+            return h.apology("Du må oppgi brukernavn", 403)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("Du må oppgi passord", 403)
+            return h.apology("Du må oppgi passord", 403)
 
         # Query database for username
         rows = db.execute(
@@ -115,7 +112,7 @@ def login():
         if len(rows) != 1 or not check_password_hash(
             rows[0]["hash"], request.form.get("password")
         ):
-            return apology("Du oppga ugyldig brukernavn og passord", 403)
+            return h.apology("Du oppga ugyldig brukernavn og passord", 403)
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -140,9 +137,9 @@ def logout():
 
 
 @app.route("/rapporter", methods=["GET", "POST"])
-@login_required
+@h.login_required
 def rapporter():
-    """Get stock quote."""
+
     if request.method == "POST":
         business_id = request.form.get("business_id")
         
@@ -189,14 +186,14 @@ def register():
             return render_template('register.html', error=error)
         
         # Ensure last valid email is provided
-        if (email_validation := validate_email(usr_email)):
+        if (email_validation := h.validate_email(usr_email)):
             return render_template('register.html', error=email_validation[0])
         
         # Validate phone number
-        if (phone_validation := validate_cellphone(usr_cellphone)):
+        if (phone_validation := h.validate_cellphone(usr_cellphone)):
             return render_template('register.html', error=phone_validation[0])
         # Ensure username was submitted correctly
-        validation_error = validate_username(db, usr_username)
+        validation_error = h.validate_username(db, usr_username)
         if validation_error:
             error = validation_error[0]
             return render_template('register.html', error=error)
@@ -217,7 +214,7 @@ def register():
             return render_template('register.html', error=error)
         
         # Validate the password
-        if (pwd_validation := validate_password(usr_pwd, usr_username)):
+        if (pwd_validation := h.validate_password(usr_pwd, usr_username)):
             return render_template('register.html', error=pwd_validation[0])
 
  
