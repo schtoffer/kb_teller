@@ -8,6 +8,11 @@
     <div class="mb-3">
         <h1>Registrer ny bruker</h1>
     </div>
+    {% if error %}
+        <div class="alert alert-danger text-center w-auto mx-auto" role="alert">
+            <p class="mb-0">{{ error }}</p>
+        </div>
+    {% endif %}
     <form action="/registrer-bruker" method="post">
         <div class="mb-3">
             <input
@@ -48,6 +53,7 @@
                 placeholder="Mobilnummer" 
                 type="text"
                 value="{{ request.form.cellphone if request.form.cellphone else '' }}"
+                maxlength="8"
             >
         </div>
         <div class="mb-3">
@@ -82,11 +88,6 @@
                 autocomplete="new-password"
             >
         </div>
-        {% if error %}
-            <div class="alert alert-danger text-center w-auto mx-auto" role="alert">
-                <p>{{ error }}</p>
-            </div>
-        {% endif %}
         <div class="d-flex justify-content-center">
             <button class="btn btn-primary" type="submit">Registrer ny bruker</button>
         </div>
