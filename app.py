@@ -12,6 +12,9 @@ from utils.sql_utils import sql
 # Configure application
 app = Flask(__name__)
 
+# Set the API key in an environment variable or a configuration
+app.config['GOOGLE_MAPS_API_KEY'] = os.getenv('GOOGLE_MAPS_API_KEY')
+
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -250,3 +253,16 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
+    
+
+@app.route("/registrer-tilbud", methods=["GET", "POST"])
+def register_business():
+
+    # Pass the API key to the template securely
+    api_key = app.config['GOOGLE_MAPS_API_KEY']
+    
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('register-business.html', access_token=api_key)

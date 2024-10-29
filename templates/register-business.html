@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Registrer nytt tilbud
+{% endblock %}
+
+{% block main %}
+    <div class="mb-3">
+        <h1>Registrer nytt tilbud</h1>
+    </div>
+    {% if error %}
+        <div class="alert alert-danger text-center w-auto mx-auto" role="alert">
+            <p class="mb-0">{{ error }}</p>
+        </div>
+    {% endif %}
+    <div class="container">
+        <form action="/registrer-tilbud" method="post" class="mx-auto" style="max-width: 600px;">
+            <div class="mb-3">
+                <input name="business_name" autofocus autocomplete="off" class="form-control" placeholder="Navn på tilbudet" type="text" value="{{ request.form.business_name if request.form.business_name else '' }}">
+            </div>
+            <div class="mb-3">
+                <input autocomplete="off" class="form-control" name="street_name" placeholder="Besøksadresse" type="text" value="{{ request.form.street_name if request.form.street_name else '' }}">
+            </div>
+            <div class="mb-3 row">
+                <div class="col-4">
+                    <input autocomplete="off" class="form-control" name="post_code" placeholder="Postnr" type="text" value="{{ request.form.post_code if request.form.post_code else '' }}" maxlength="4">
+                </div>
+                <div class="col-8">
+                    <input autocomplete="off" class="form-control" name="city" placeholder="Poststed" type="text" value="{{ request.form.city if request.form.city else '' }}">
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mt-2" onclick="fetchCoordinates()">Finn koordinater</button>
+            
+            <div id="map"></div>
+    
+            <input type="hidden" name="latitude" id="latitude" value="">
+            <input type="hidden" name="longitude" id="longitude" value="">
+
+            <div id="googleMap" style="height: 300px; width: 100%;"></div>
+    
+            <div class="d-flex justify-content-center mt-3">
+                <button class="btn btn-primary" type="submit">Registrer nytt tilbud</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let map, marker;
+    
+        // Initialize and add the map
+        function initMap() {
+            console.log("Initializing the map...");
+
+            // Create a new map centered at a default location
+            map = new google.maps.Map(document.getElementById('googleMap'), {
+                center: { lat: 51.505, lng: -0.09 }, // Default coordinates (you can change this)
+                zoom: 13
+            });
+
+            // Create a draggable marker on the map
+            marker = new google.maps.Marker({
+                position: { lat: 51.505, lng: -0.09 },
+                map: map,
+                draggable: true
+            });
+
+            // Event listener to update coordinates when the marker is dragged
+            google.maps.event.addListener(marker, 'dragend', function () {
+                const position = marker.getPosition();
+                document.getElementById('latitude').value = position.lat();
+                document.getElementById('longitude').value = position.lng();
+            });
+        }
+
+        // Fetch coordinates based on the entered address
+        async function fetchCoordinates() {
+            const street = document.querySelector("input[name='street_name']").value;
+            const city = document.querySelector("input[name='city']").value;
+            const postCode = document.querySelector("input[name='post_code']").value;
+
+            const address = `${street}, ${postCode}, ${city}`;
+            const apiKey = "{{ access_token | safe }}"; // Access the key passed from Flask securely
+            const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+            
+            // Log the constructed URL to the browser console
+            console.log("Constructed Geocode URL: ", geocodeUrl);
+
+            try {
+                const response = await fetch(geocodeUrl);
+                const data = await response.json();
+
+                if (data.status === "OK" && data.results.length > 0) {
+                    const location = data.results[0].geometry.location;
+                    updateMap(location.lat, location.lng);
+                    document.getElementById('latitude').value = location.lat;
+                    document.getElementById('longitude').value = location.lng;
+                } else {
+                    alert("Could not find coordinates for the entered address.");
+                }
+            } catch (error) {
+                console.error("Error fetching geocode data:", error);
+                alert("An error occurred while fetching the coordinates.");
+            }
+        }
+
+        // Update the map and marker position
+        function updateMap(lat, lng) {
+            if (!map) {
+                console.error("Map is not initialized.");
+                return;
+            }
+            const position = { lat, lng };
+            map.setCenter(position);
+            map.setZoom(16);
+            marker.setPosition(position);
+        }
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ access_token | safe }}&callback=initMap"></script>
+
+{% endblock %}
