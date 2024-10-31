@@ -18,12 +18,12 @@
                         </tr>
                     </thead>
                     <tbody class="table-group-divider">
-                        {% for business in businesses%}
+                        {% for reporting_business in reporting_businesses %}
                         <tr>
-                            <td>{{ business.name }}</td>
+                            <td>{{ reporting_business.name }}</td>
                             <td>
                                 <form action="/rapporter" method="POST">
-                                    <input type="hidden" name="business_id" value="{{ business.id }}">
+                                    <input type="hidden" name="reporting_business_id" value="{{ reporting_business.id }}">
                                     <button type="submit" class="btn btn-primary btn-sm">Rapporter</button>
                                 </form>
                             </td>

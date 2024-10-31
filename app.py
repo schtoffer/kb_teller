@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, flash, redirect, render_template, g, request, session
+from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -22,8 +22,7 @@ Session(app)
 # Set the API key in an environment variable or a configuration
 app.config['GOOGLE_MAPS_API_KEY'] = os.getenv('GOOGLE_MAPS_API_KEY')
 
-
-# Configure CS50 Library to use SQLite database
+# Configure SQLite database
 db = SQL(f"sqlite:///{DATABASE}")
 
 @app.after_request
@@ -34,27 +33,21 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+
 @app.route("/")
 @h.login_required
 def index():
     # Logged in user id
     user_id = session["user_id"]
 
-    # # Retrieve fname
-    # fname = DB.execute("SELECT usr_fname FROM user_details WHERE user_id = ?", session["user_id"])[0]['usr_fname']
-    
-    # # Retreive businesses the user has access to
-    # businesses = DB.execute("SELECT * FROM businesses WHERE id IN (SELECT business_id FROM user_business_access WHERE user_id = ?)", session["user_id"])
-
-    # # Query the user's role
-    # user_roles = DB.execute("SELECT role_name FROM user_roles WHERE user_id = ?", user_id)
- 
+    # Prepare values for template rendering
+    fname = get_fname(user_id)
+    username = get_username(user_id)
+    admin = is_admin(user_id)
+    reporting_businesses = get_reporting_buinesses(user_id)
 
     # Render welcome page
-    return render_template("index.html", fname=get_fname(user_id), username=get_username(user_id),
-                           #businesses=businesses,
-                           is_admin=is_admin(user_id)
-                           )
+    return render_template("index.html", fname=fname, username=username, is_admin=admin, reporting_businesses=reporting_businesses)
 
 @app.route("/admin", methods=["GET", "POST"])
 @h.login_required
