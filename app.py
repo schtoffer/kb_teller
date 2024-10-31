@@ -80,7 +80,6 @@ def admin():
 
         # Retrieve all users
         users = db.execute("SELECT * FROM users")
-        print(users)
 
         # Return the admin panel page
         return render_template("admin.html", 
