@@ -55,4 +55,7 @@ def is_admin(user_id):
     roles = get_user_roles(user_id)
     return any(role['role_name'] == 'admin' for role in roles)
 
+def get_reporting_buinesses(user_id):
+    return DB.execute("SELECT * FROM businesses WHERE id IN (SELECT business_id FROM user_business_access WHERE user_id = ?)", user_id)
+
 main()
