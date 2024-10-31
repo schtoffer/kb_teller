@@ -1,9 +1,11 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, g, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
+import sqlite3
+
 
 import helpers as h
 from utils.date_utils import format_dates
@@ -21,7 +23,25 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///kb_teller.db")
+DATABASE = "kb_teller.db"
+
+db = SQL(f"sqlite:///{DATABASE}")
+
+def get_db():
+    """Open a new database connection if one doesn't exist for the current application context."""
+    if 'db' not in g:
+        g.db = sqlite3.connect(DATABASE)
+    return g.db
+
+def init_db():
+    """Initialize the database with the schema from schema.sql if it doesn't already exist."""
+    if not os.path.exists(DATABASE):  # Check if the database file already exists
+        with sqlite3.connect(DATABASE) as conn:
+            with open("schema.sql", "r") as f:
+                conn.executescript(f.read())  # Executes the entire schema.sql script
+
+# Initialize the database at app startup
+init_db()
 
 
 @app.after_request
