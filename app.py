@@ -1,48 +1,30 @@
 import os
 
-from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, g, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-import sqlite3
 
 
 import helpers as h
 from utils.date_utils import format_dates
-from utils.sql_utils import sql
+from db import *
+
+### from utils.sql_utils import sql
 
 # Configure application
 app = Flask(__name__)
-
-# Set the API key in an environment variable or a configuration
-app.config['GOOGLE_MAPS_API_KEY'] = os.getenv('GOOGLE_MAPS_API_KEY')
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+# Set the API key in an environment variable or a configuration
+app.config['GOOGLE_MAPS_API_KEY'] = os.getenv('GOOGLE_MAPS_API_KEY')
+
+
 # Configure CS50 Library to use SQLite database
-DATABASE = "kb_teller.db"
-
 db = SQL(f"sqlite:///{DATABASE}")
-
-def get_db():
-    """Open a new database connection if one doesn't exist for the current application context."""
-    if 'db' not in g:
-        g.db = sqlite3.connect(DATABASE)
-    return g.db
-
-def init_db():
-    """Initialize the database with the schema from schema.sql if it doesn't already exist."""
-    if not os.path.exists(DATABASE):  # Check if the database file already exists
-        with sqlite3.connect(DATABASE) as conn:
-            with open("schema.sql", "r") as f:
-                conn.executescript(f.read())  # Executes the entire schema.sql script
-
-# Initialize the database at app startup
-init_db()
-
 
 @app.after_request
 def after_request(response):
@@ -52,30 +34,26 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-
 @app.route("/")
 @h.login_required
 def index():
-    # Retrieve user id
+    # Logged in user id
     user_id = session["user_id"]
 
-    # Retrieve fname
-    fname = db.execute("SELECT usr_fname FROM user_details WHERE user_id = ?", session["user_id"])[0]['usr_fname']
+    # # Retrieve fname
+    # fname = DB.execute("SELECT usr_fname FROM user_details WHERE user_id = ?", session["user_id"])[0]['usr_fname']
     
-    # Retreive businesses the user has access to
-    businesses = db.execute("SELECT * FROM businesses WHERE id IN (SELECT business_id FROM user_business_access WHERE user_id = ?)", session["user_id"])
+    # # Retreive businesses the user has access to
+    # businesses = DB.execute("SELECT * FROM businesses WHERE id IN (SELECT business_id FROM user_business_access WHERE user_id = ?)", session["user_id"])
 
-    # Query the user's role
-    user_roles = db.execute("SELECT role_name FROM user_roles WHERE user_id = ?", user_id)
-    
-    # Check if the user has the admin role
-    is_admin = any(role['role_name'] == 'admin' for role in user_roles)
+    # # Query the user's role
+    # user_roles = DB.execute("SELECT role_name FROM user_roles WHERE user_id = ?", user_id)
+ 
 
     # Render welcome page
-    return render_template("index.html",
-                           fname=fname,
-                           businesses=businesses,
-                           is_admin=is_admin
+    return render_template("index.html", fname=get_fname(user_id), username=get_username(user_id),
+                           #businesses=businesses,
+                           is_admin=is_admin(user_id)
                            )
 
 @app.route("/admin", methods=["GET", "POST"])
@@ -85,7 +63,7 @@ def admin():
     user_id = session["user_id"]
 
     # Get user roles
-    user_roles = db.execute("SELECT role_name FROM user_roles WHERE user_id IN (?)", user_id)
+    user_roles = DB.execute("SELECT role_name FROM user_roles WHERE user_id IN (?)", user_id)
 
     # Make sure the user is an admin
     is_admin = any(user_role['role_name'] == 'admin' for user_role in user_roles)
@@ -96,10 +74,10 @@ def admin():
     
     else:
         # Retreive all businesses
-        businesses = db.execute("SELECT * FROM businesses")
+        businesses = DB.execute("SELECT * FROM businesses")
 
         # Retrieve all users
-        users = db.execute("SELECT * FROM users")
+        users = DB.execute("SELECT * FROM users")
 
         # Return the admin panel page
         return render_template("admin.html", 
@@ -126,7 +104,7 @@ def login():
             return h.apology("Du må oppgi passord", 403)
 
         # Query database for username
-        rows = db.execute(
+        rows = DB.execute(
             "SELECT * FROM users WHERE username = ?", request.form.get("username")
         )
 
@@ -189,44 +167,46 @@ def register():
     if request.method == "POST":
         
         # Define variables
-        usr_username = request.form.get("username").lower()
-        usr_pwd = request.form.get("password")
-        usr_pwd_repeat = request.form.get("confirmation")
-        usr_fname = request.form.get("fname").capitalize()
-        usr_lname = request.form.get("lname").capitalize()
-        usr_email = request.form.get("email").lower()
-        usr_cellphone = request.form.get("cellphone")
+        form_fname = request.form.get("fname").capitalize()
+        form_lname = request.form.get("lname").capitalize()
+        form_username = request.form.get("username").lower()
+        form_pwd = request.form.get("password")
+        form_pwd_repeat = request.form.get("confirmation")
+        form_email = request.form.get("email").lower()
+        form_cellphone = request.form.get("cellphone")
+
+        print(form_fname, form_lname, form_username, form_pwd, form_email, form_cellphone)
         
         # Ensure first name is provided
-        if not usr_fname:
+        if not form_fname:
             error = "Fornavn mangler"
             return render_template('register.html', error=error)
 
         # Ensure last name is provided
-        if not usr_lname:
+        if not form_lname:
             error = "Etternavn mangler"
             return render_template('register.html', error=error)
         
         # Ensure last valid email is provided
-        if (email_validation := h.validate_email(usr_email)):
+        if (email_validation := h.validate_email(form_email)):
             return render_template('register.html', error=email_validation[0])
         
         # Validate phone number
-        if (phone_validation := h.validate_cellphone(usr_cellphone)):
+        if (phone_validation := h.validate_cellphone(form_cellphone)):
             return render_template('register.html', error=phone_validation[0])
         # Ensure username was submitted correctly
-        validation_error = h.validate_username(db, usr_username)
+        validation_error = h.validate_username(db, form_username)
         if validation_error:
             error = validation_error[0]
             return render_template('register.html', error=error)
 
         # Ensure password was submitted
-        elif not usr_pwd:
+        elif not form_pwd:
             error = "Pasord mangler"
             return render_template('register.html', error=error)
 
         # Ensure confirmation of password was submitted
-        elif not usr_pwd_repeat:
+        elif not form_pwd_repeat:
             error = "Du må bekrefte passordet"
             return render_template('register.html', error=error)
 
@@ -236,34 +216,34 @@ def register():
             return render_template('register.html', error=error)
         
         # Validate the password
-        if (pwd_validation := h.validate_password(usr_pwd, usr_username)):
+        if (pwd_validation := h.validate_password(form_pwd, form_username)):
             return render_template('register.html', error=pwd_validation[0])
 
  
         # Hash the password
-        pwdhash = generate_password_hash(usr_pwd)
+        pwdhash = generate_password_hash(form_pwd)
 
         # Insert new user to the users table
         
-        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", usr_username, pwdhash)
+        DB.execute("INSERT INTO users (username, hash) VALUES (?, ?)", form_username, pwdhash)
 
         # Retrieve the users id
-        result = db.execute("SELECT id FROM users WHERE username = ?", usr_username)
+        result = DB.execute("SELECT id FROM users WHERE username = ?", form_username)
         if result:  # Check if the result is not empty
             usr_id = result[0]['id']  # Extract the id from the first row
         else:
             usr_id = None  # Handle case where no user is found
 
         # Insert user detail to the user_details table
-        db.execute("INSERT INTO user_details (usr_fname, usr_lname, usr_email, usr_cellphone, user_id) VALUES (?, ?, ?, ?, ?)", 
-                   request.form.get("fname"), 
-                   request.form.get("lname"),
-                   request.form.get("email"),
-                   request.form.get("cellphone"),
+        DB.execute("INSERT INTO user_details (usr_fname, usr_lname, usr_email, usr_cellphone, user_id) VALUES (?, ?, ?, ?, ?)", 
+                   form_fname, 
+                   form_lname,
+                   form_email,
+                   form_cellphone,
                    usr_id)
 
         # Log the user in
-        rows = db.execute("SELECT id FROM users WHERE username = ?", request.form.get("username"))
+        rows = DB.execute("SELECT id FROM users WHERE username = ?", request.form.get("username"))
         user_id = rows[0]["id"]
         session["user_id"] = user_id
 
