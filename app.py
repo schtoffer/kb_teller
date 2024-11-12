@@ -1,7 +1,7 @@
 import os
-
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
+from flask_babel import Babel, _
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -9,7 +9,7 @@ import helpers as h
 from utils.date_utils import format_dates
 from db import *
 
-### from utils.sql_utils import sql
+from utils.sql_utils import sql
 
 # Configure application
 app = Flask(__name__)
@@ -21,6 +21,29 @@ Session(app)
 
 # Set the API key in an environment variable or a configuration
 app.config['GOOGLE_MAPS_API_KEY'] = os.getenv('GOOGLE_MAPS_API_KEY')
+
+# Configure Babel settings
+app.config['BABEL_DEFAULT_LOCALE'] = 'no'  # Default language
+app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'no']  # Supported languages
+
+# Initialize Babel
+babel = Babel(app)
+
+# Locale selector function
+def get_locale():
+    # Check the 'lang' query parameter first, then fall back to session or `Accept-Language` header
+    language = request.args.get('lang')
+    if language:
+        # Store the user's selection in the session for persistence
+        session['lang'] = language
+    else:
+        # Use the stored selection or the browser's preferred language
+        language = session.get('lang', request.accept_languages.best_match(['no', 'en']))
+    
+    print("Selected language: " + language)
+    return language
+
+babel.init_app(app, locale_selector=get_locale)
 
 # Configure SQLite database
 db = SQL(f"sqlite:///{DATABASE}")

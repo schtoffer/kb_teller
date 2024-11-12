@@ -46,6 +46,26 @@
                             <li class="nav-item"><a class="nav-link" href="/login">Logg inn</a></li>
                         </ul>
                     {% endif %}
+                    <!-- Language Selector Dropdown -->
+                    <ul class="navbar-nav ms-3 mt-2">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                🌐 {{ _('Language') }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="?lang=no">
+                                        🇳🇴 Norsk
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?lang=en">
+                                        🇬🇧 English
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>

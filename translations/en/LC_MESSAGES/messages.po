@@ -1,0 +1,56 @@
+# English translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-12 19:54+0100\n"
+"PO-Revision-Date: 2024-11-12 19:41+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: templates/register.html:4
+msgid "Log In"
+msgstr ""
+
+#: templates/register.html:9 templates/register.html:92
+msgid "Registrer ny bruker"
+msgstr "Register new user"
+
+#: templates/register.html:23
+msgid "Fornavn"
+msgstr "First name"
+
+#: templates/register.html:33
+msgid "Etternavn"
+msgstr "Last name"
+
+#: templates/register.html:43
+msgid "E-post"
+msgstr "Email"
+
+#: templates/register.html:53
+msgid "Mobilnummer"
+msgstr "Cell phone"
+
+#: templates/register.html:65
+msgid "Brukernavn"
+msgstr "Username"
+
+#: templates/register.html:76
+msgid "Passord"
+msgstr "Password"
+
+#: templates/register.html:86
+msgid "Gjenta passord"
+msgstr "Repeat password"
+

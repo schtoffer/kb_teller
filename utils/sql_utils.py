@@ -1,6 +1,6 @@
 from cs50 import SQL
 
-db = SQL("sqlite:///kb_teller.db")
+db = SQL("sqlite:///db.db")
 
 def sql(table, column, id):
     result = db.execute(f"SELECT {column} FROM {table} WHERE id = ?", id)
@@ -8,4 +8,6 @@ def sql(table, column, id):
     # Check if there is at least one result
     if result:
         return result[0][column]  
-    return None  
+    return None 
+
+print(sql("businesses", "name", 1))

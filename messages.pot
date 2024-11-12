@@ -1,0 +1,55 @@
+# Translations template for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-12 19:54+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: templates/register.html:4
+msgid "Log In"
+msgstr ""
+
+#: templates/register.html:9 templates/register.html:92
+msgid "Registrer ny bruker"
+msgstr ""
+
+#: templates/register.html:23
+msgid "Fornavn"
+msgstr ""
+
+#: templates/register.html:33
+msgid "Etternavn"
+msgstr ""
+
+#: templates/register.html:43
+msgid "E-post"
+msgstr ""
+
+#: templates/register.html:53
+msgid "Mobilnummer"
+msgstr ""
+
+#: templates/register.html:65
+msgid "Brukernavn"
+msgstr ""
+
+#: templates/register.html:76
+msgid "Passord"
+msgstr ""
+
+#: templates/register.html:86
+msgid "Gjenta passord"
+msgstr ""
+
