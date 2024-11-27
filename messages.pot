@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-12 19:54+0100\n"
+"POT-Creation-Date: 2024-11-12 20:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,12 +17,69 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: templates/register.html:4
-msgid "Log In"
+#: templates/index.html:11
+msgid "velkommen tilbake!"
 msgstr ""
 
-#: templates/register.html:9 templates/register.html:92
+#: templates/index.html:12
+msgid "Her er en oversikt over virksomhetene du disponerer:"
+msgstr ""
+
+#: templates/index.html:27
+msgid "Rapporter"
+msgstr ""
+
+#: templates/layout.html:37
+msgid "Admin"
+msgstr ""
+
+#: templates/layout.html:41
+msgid "Logg ut"
+msgstr ""
+
+#: templates/layout.html:45 templates/register.html:9
+#: templates/register.html:92
 msgid "Registrer ny bruker"
+msgstr ""
+
+#: templates/layout.html:46
+msgid "Logg inn"
+msgstr ""
+
+#: templates/layout.html:53
+msgid "Language"
+msgstr ""
+
+#: templates/layout.html:102
+msgid "Et lite prosjekt laget av Christoffer Andersen"
+msgstr ""
+
+#: templates/rapport.html:11
+msgid "Rapportér for"
+msgstr ""
+
+#: templates/rapport.html:11
+msgid "(siste 14 dager)"
+msgstr ""
+
+#: templates/rapport.html:15
+msgid "Dato"
+msgstr ""
+
+#: templates/rapport.html:16
+msgid "Antall besøk"
+msgstr ""
+
+#: templates/rapport.html:25
+msgid "Hvor mange besøk?"
+msgstr ""
+
+#: templates/rapport.html:26
+msgid "Lagre"
+msgstr ""
+
+#: templates/register.html:4
+msgid "Log In"
 msgstr ""
 
 #: templates/register.html:23

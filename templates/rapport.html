@@ -8,22 +8,25 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <p>Rapportér for <b>{{ business_name }}</b> (siste 14 dager)</p>
+            <p>{{ _('Rapportér for') }} <b>{{ business_name }}</b> {{ _('(siste 14 dager)') }}</p>
             <table class="table table-bordered">
                 <thead>
                     <tr class="table-dark">
-                        <th scope="col">Dato</th>
-                        <th scope="col">Atall besøk</th>
+                        <th scope="col">{{ _('Dato') }}</th>
+                        <th scope="col">{{ _('Antall besøk') }}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for formatted_date in formatted_dates %}
+                    {% for date in dates %}
                     <tr class="table-info">
-                        <td>{{ formatted_date }}</td>
+                        <td>{{ date }} </td>
                         <td>
-                            <form action="/your-action-path" method="POST" class="d-flex align-items-center">
-                                <input type="number" name="number_input" min="0" required class="form-control me-2" placeholder="Hvor mange besøk?" style="width: 100px;">
-                                <button type="submit" class="btn btn-primary">Lagre</button>
+                            <form action="/rapporter" method="POST" class="d-flex align-items-center">
+                                <input type="hidden" name="business_id" value="{{ business_id }}">
+                                <input type="hidden" name="report_date" value="{{ date }}">
+                                <input type="hidden" name="report_metric" value="visitors">
+                                <input type="number" name="report_num" min="0" required class="form-control me-2" placeholder="{{ _('Hvor mange besøk?') }}" style="width: 300px;">
+                                <button type="submit" class="btn btn-primary">{{ _('Lagre') }}</button>
                             </form>
                         </td>
                     </tr>

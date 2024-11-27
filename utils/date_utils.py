@@ -19,3 +19,9 @@ def format_dates(num_days=14):
         formatted_dates.append(formatted_date)
 
     return formatted_dates
+
+def get_dates(num_days=14):
+    """Generate a list of dates in 'YYYY-MM-DD' format for today and the last num_days."""
+    today = datetime.today()
+    dates = [(today - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(num_days)]
+    return dates

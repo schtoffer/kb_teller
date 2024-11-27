@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="no">
 
     <head>
 
@@ -34,16 +34,16 @@
                     {% if session["user_id"] %}
                         <ul class="navbar-nav me-auto mt-2">
                             {% if is_admin %}
-                            <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin">{{ _('Admin') }}</a></li>
                             {% endif %}
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/logg-ut">Logg ut</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/logg-ut">{{ _('Logg ut') }}</a></li>
                         </ul>
                     {% else %}
                         <ul class="navbar-nav ms-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/registrer-bruker">Registrer ny bruker</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/login">Logg inn</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/registrer-bruker">{{ _('Registrer ny bruker') }}</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/login">{{ _('Logg inn') }}</a></li>
                         </ul>
                     {% endif %}
                     <!-- Language Selector Dropdown -->
@@ -99,7 +99,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <p>Et aldri så lite prosjekt laget av Christoffer Andersen</p>
+                        <p>{{ _('Et lite prosjekt laget av Christoffer Andersen') }}</p>
                     </div>
                 </div>
             </div>

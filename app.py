@@ -6,10 +6,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 
 import helpers as h
-from utils.date_utils import format_dates
+from utils.date_utils import format_dates, get_dates
 from db import *
 
-from utils.sql_utils import sql
+from utils.sql_utils import sql, insert_or_update_report
 
 # Configure application
 app = Flask(__name__)
@@ -157,18 +157,37 @@ def logout():
 def rapporter():
 
     if request.method == "POST":
+
+        # Check to see if a report was submitted
+        if request.form.get("report_date"):
+            
+            # Prepare data for db
+            business_id = request.form.get("business_id")
+            date = request.form.get("report_date")
+            metric = request.form.get("report_metric")
+            num = request.form.get("report_num")
+
+            insert_or_update_report(business_id, date, metric, num)
+
         business_id = request.form.get("business_id")
+        print(business_id)
         
         # Get name of business
         business_name = sql("businesses", "name", business_id)
 
+        dates = get_dates(14)
+
         # Get 14 formatted days
         formatted_dates = format_dates(14)
 
+        # Get reported numbers for the last 14 days
+
         return render_template("rapport.html", 
-                               business_id=business_id, 
+                               business_id=business_id,
+                               dates=dates,
                                formatted_dates=formatted_dates,
-                               business_name=business_name)
+                               business_name=business_name,
+                            )
     else:
         return redirect("/")
     
